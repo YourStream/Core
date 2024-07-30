@@ -1,0 +1,1 @@
+export type SystemServiceEvent = 'start' | 'stop' | 'restart' | 'shutdown';
