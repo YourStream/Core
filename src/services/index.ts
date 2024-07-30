@@ -5,6 +5,7 @@ import { IBaseService } from './IBaseService';
 import { BaseService } from './BaseService';
 import { SystemService } from './SystemService';
 import { SystemStatistic } from './systemStatistic';
+import { SchedulerService } from './schedulerService';
 
 export {
     serviceManager,
@@ -13,5 +14,6 @@ export {
     IBaseService,
     BaseService,
     SystemService,
-    SystemStatistic
+    SystemStatistic,
+    SchedulerService
 }
