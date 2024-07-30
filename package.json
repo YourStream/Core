@@ -30,6 +30,9 @@
   "bugs": {
     "url": "https://github.com/YourStream/Core/issues"
   },
+  "publishConfig":{
+    "registry": "https://npm.pkg.github.com/"
+  },
   "homepage": "https://github.com/YourStream/Core#readme",
   "devDependencies": {},
   "description": ""
