@@ -1,6 +1,6 @@
 {
   "name": "@yourstream/core",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -11,7 +11,8 @@
     "./services": "./dist/src/services/index.js",
     "./services/*": "./dist/src/services/*",
     "./types": "./dist/src/types/index.js",
-    "./types/*": "./dist/src/types/*"
+    "./types/*": "./dist/src/types/*",
+    "./models": "./dist/src/models/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   "author": "VoDACode",
   "license": "ISC",
   "dependencies": {
+    "@types/amqplib": "^0.10.5",
     "@types/express": "^4.17.21",
     "amqplib": "^0.10.4",
     "pino": "^9.3.2"
@@ -32,10 +34,9 @@
   "bugs": {
     "url": "https://github.com/YourStream/Core/issues"
   },
-  "publishConfig":{
+  "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
   "homepage": "https://github.com/YourStream/Core#readme",
-  "devDependencies": {},
   "description": ""
 }
