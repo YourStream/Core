@@ -65,7 +65,7 @@ export class RabbitMQService {
             throw new Error('SERVICE_NAME is missing from environment variables');
         }
 
-        const controllerFiles = fs.readdirSync(path.join(__dirname, '../controllers'));
+        const controllerFiles = fs.readdirSync(path.join(path.dirname(require.main.filename), 'controllers'));
         if(controllerFiles.length == 0) {
             logger.error('No controllers found!\n Make sure you have at least one controller in the controllers folder.');
             serviceManager.get(SystemService).shutdown();
@@ -73,7 +73,7 @@ export class RabbitMQService {
         }
 
         controllerFiles.forEach((controllerFile) => {
-            const controller = require(path.join(__dirname, '../controllers', controllerFile));
+            const controller = require(path.join(path.dirname(require.main.filename), 'controllers', controllerFile));
             const functions = Object.keys(controller);
             logger.info(`Loaded controller: ${controllerFile}`);
             functions.forEach(async (func) => {
