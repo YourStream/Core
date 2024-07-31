@@ -1,6 +1,6 @@
 import serviceManager from './ServiceManager';
 import scopeManager from './ScopeManager';
-import { RabbitMQService } from './RabbitMQService';
+import { RabbitMQService, RabbitMQConfirmationService, RabbitMQUserDataService } from './RabbitMQService';
 import { IBaseService } from './IBaseService';
 import { BaseService } from './BaseService';
 import { SystemService } from './SystemService';
@@ -10,7 +10,7 @@ import { SchedulerService } from './SchedulerService';
 export {
     serviceManager,
     scopeManager,
-    RabbitMQService,
+    RabbitMQService, RabbitMQConfirmationService, RabbitMQUserDataService,
     IBaseService,
     BaseService,
     SystemService,
