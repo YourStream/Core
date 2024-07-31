@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { serviceManager } from '.';
 import { SystemService } from './SystemService';
+import { BaseResponse } from '../models';
 
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
@@ -86,19 +87,23 @@ export class RabbitMQService {
                 }
                 channel.assertQueue(channelName, { durable: false });
                 channel.prefetch(1);
-                channel.consume(channelName, (msg) => {
+                channel.consume(channelName, async (msg) => {
                     if (!msg) {
                         return;
                     }
                     const content = msg.content.length == 0 ? "" : JSON.parse(msg.content.toString());
-                    logger.info(`Received message: ${content}`);
-                    controller[func](content).then((response: any) => {
-                        response = response ?? {};
+                    let response: BaseResponse = null;
+                    channel.ack(msg);
+                    try{
+                        response = await controller[func](content);
+                    } catch (error) {
+                        logger.error(`Error while processing message (${channelName}): ${error}`);
+                        response = BaseResponse.error('Error while processing message');
+                    } finally{
                         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(response)), {
                             correlationId: msg.properties.correlationId
                         });
-                        channel.ack(msg);
-                    });
+                    }
                 });
                 logger.info(`Listening on channel: ${channelName}`);
             });
