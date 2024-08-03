@@ -4,7 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import { serviceManager } from '.';
 import { SystemService } from './SystemService';
-import { BaseResponse } from '../models';
+import { BaseResponse, CreateConfirmResponse } from '../models';
+import { UserPublicResponse, UserResponse } from '../models/userdataservice.response';
 
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
@@ -138,7 +139,7 @@ abstract class BaseRabbitMQCommunicator {
         });
     }
 
-    public async send<T>(queueName: string, message: Object): Promise<T> {
+    public async send<T = BaseResponse>(queueName: string, message: Object): Promise<T> {
         const responsePromise = new Promise<T>(async (resolve, reject) => {
             try {
                 const correlationId = generateUuid();
@@ -175,16 +176,16 @@ export class RabbitMQConfirmationService extends BaseRabbitMQCommunicator {
         return 'ConfirmationService';
     }
 
-    public async create(req: { userId: string, type: 'email-code' | 'password' | '2fa', metadata: any }) {
-        return await this.send(`${this.name}.create`, req);
+    public async create(req: { userId: string, type: 'email-code' | 'password' | '2fa', metadata: any }): Promise<CreateConfirmResponse> {
+        return await this.send<CreateConfirmResponse>(`${this.name}.create`, req);
     }
 
-    public async resolve(req: { token: string }) {
-        return await this.send(`${this.name}.resolve`, req);
+    public async resolve(req: { token: string }): Promise<BaseResponse> {
+        return await this.send<BaseResponse>(`${this.name}.resolve`, req);
     }
 
-    public async deleteOld() {
-        return await this.send(`${this.name}.deleteOld`, {});
+    public async deleteOld(): Promise<BaseResponse> {
+        return await this.send<BaseResponse>(`${this.name}.deleteOld`, {});
     }
 }
 
@@ -194,35 +195,35 @@ export class RabbitMQUserDataService extends BaseRabbitMQCommunicator {
     }
 
     public async createUserAccount(req: { nickname: string, email: string, bio?: string, dayOfBirthday: Date }) {
-        return await this.send(`${this.name}.createUserAccount`, req);
+        return await this.send<UserResponse>(`${this.name}.createUserAccount`, req);
     }
 
     public async getUserAccountById(req: { id: string }) {
-        return await this.send(`${this.name}.getUserAccountById`, req);
+        return await this.send<UserPublicResponse>(`${this.name}.getUserAccountById`, req);
     }
 
     public async getUserAccountByNickname(req: { nickname: string }) {
-        return await this.send(`${this.name}.getUserAccountByNickname`, req);
+        return await this.send<UserPublicResponse>(`${this.name}.getUserAccountByNickname`, req);
     }
 
     public async getUserStreamTokenById(req: { id: string }) {
-        return await this.send(`${this.name}.getUserStreamTokenById`, req);
+        return await this.send<BaseResponse<string>>(`${this.name}.getUserStreamTokenById`, req);
     }
 
     public async updateNickname(req: { id: string, nickname: string }) {
-        return await this.send(`${this.name}.updateNickname`, req);
+        return await this.send<UserResponse>(`${this.name}.updateNickname`, req);
     }
 
     public async updateEmail(req: { id: string, email: string }) {
-        return await this.send(`${this.name}.updateEmail`, req);
+        return await this.send<UserResponse>(`${this.name}.updateEmail`, req);
     }
 
     public async updateBaseInfo(req: { id: string, bio: string, dayOfBirthday: Date }) {
-        return await this.send(`${this.name}.updateBaseInfo`, req);
+        return await this.send<UserResponse>(`${this.name}.updateBaseInfo`, req);
     }
 
     public async recreateStreamToken(req: { id: string }) {
-        return await this.send(`${this.name}.recreateStreamToken`, req);
+        return await this.send<BaseResponse<string>>(`${this.name}.recreateStreamToken`, req);
     }
 
     public async deleteUserAccount(req: { id: string }) {

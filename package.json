@@ -1,6 +1,6 @@
 {
   "name": "@yourstream/core",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -12,7 +12,8 @@
     "./services/*": "./dist/src/services/*",
     "./types": "./dist/src/types/index.js",
     "./types/*": "./dist/src/types/*",
-    "./models": "./dist/src/models/index.js"
+    "./models": "./dist/src/models/index.js",
+    "./models/*": "./dist/src/models/*"
   },
   "repository": {
     "type": "git",
