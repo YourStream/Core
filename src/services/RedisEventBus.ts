@@ -2,14 +2,14 @@ import { createClient } from 'redis';
 import { logger } from '../utils/index.js';
 import redisPool, { RedisClient } from './RedisPool.js';
 
-type Event = {
+export type BusEvent = {
     type: string;
     payload: Record<string, any>;
 };
 
-type EventHandler = (event: Event, id: string, jobId: string) => Promise<void>;
+export type BusEventHandler = (event: BusEvent, id: string, jobId: string) => Promise<void>;
 
-interface BusOptions {
+export interface BusOptions {
     streamKey: string;
     group: string;
     statusKey: string;
@@ -54,7 +54,7 @@ export class RedisEventBus {
         }
     }
 
-    async publish(event: Event) {
+    async publish(event: BusEvent) {
         const client = await redisPool.acquire();
         const jobId = `${new Date().getTime()}-${Math.random()}`;
 
@@ -68,7 +68,7 @@ export class RedisEventBus {
         return jobId;
     }
 
-    async consume(consumer: string, handler: EventHandler) {
+    async consume(consumer: string, handler: BusEventHandler) {
         let client = await redisPool.acquire();
         const response = await client.xReadGroup(
             this.group,
@@ -81,7 +81,7 @@ export class RedisEventBus {
 
         for (const stream of response) {
             for (const { id, message } of stream.messages) {
-                const event: Event = {
+                const event: BusEvent = {
                     type: message.type,
                     payload: JSON.parse(message.payload),
                 };
