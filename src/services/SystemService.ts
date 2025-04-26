@@ -1,6 +1,6 @@
-import { BaseService } from "./BaseService";
-import { logger } from "../utils";
-import { SystemServiceEvent } from "../types/systemService.types";
+import { BaseService } from "./BaseService.js";
+import { logger } from "../utils/index.js";
+import { SystemServiceEvent } from "../types/systemService.types.js";
 
 export class SystemService extends BaseService<SystemServiceEvent> {
     get name(): string {

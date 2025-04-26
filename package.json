@@ -1,19 +1,49 @@
 {
   "name": "@yourstream/core",
-  "version": "0.0.22",
+  "version": "0.0.26",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": "./dist/src/index.js",
-    "./*": "./dist/src/*",
-    "./utils": "./dist/src/utils/index.js",
-    "./utils/*": "./dist/src/utils/*",
-    "./services": "./dist/src/services/index.js",
-    "./services/*": "./dist/src/services/*",
-    "./types": "./dist/src/types/index.js",
-    "./types/*": "./dist/src/types/*",
-    "./models": "./dist/src/models/index.js",
-    "./models/*": "./dist/src/models/*"
+    ".": {
+      "import": "./dist/index.js", 
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "import": "./dist/src/*",
+      "require": "./dist/src/*"
+    },
+    "./utils": {
+      "import": "./dist/src/utils/index.js",
+      "require": "./dist/src/utils/index.cjs"
+    },
+    "./utils/*": {
+      "import": "./dist/src/utils/*",
+      "require": "./dist/src/utils/*"
+    },
+    "./services": {
+      "import": "./dist/src/services/index.js",
+      "require": "./dist/src/services/index.cjs"
+    },
+    "./services/*": {
+      "import": "./dist/src/services/*",
+      "require": "./dist/src/services/*"
+    },
+    "./types": {
+      "import": "./dist/src/types/index.js",
+      "require": "./dist/src/types/index.cjs"
+    },
+    "./types/*": {
+      "import": "./dist/src/types/*",
+      "require": "./dist/src/types/*"
+    },
+    "./models": {
+      "import": "./dist/src/models/index.js",
+      "require": "./dist/src/models/index.cjs"
+    },
+    "./models/*": {
+      "import": "./dist/src/models/*",
+      "require": "./dist/src/models/*"
+    }
   },
   "repository": {
     "type": "git",
@@ -31,8 +61,10 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.7",
     "amqplib": "^0.10.4",
+    "generic-pool": "^3.9.0",
     "jsonwebtoken": "^9.0.2",
-    "pino": "^9.3.2"
+    "pino": "^9.6.0",
+    "redis": "^4.7.0"
   },
   "bugs": {
     "url": "https://github.com/YourStream/Core/issues"
@@ -41,5 +73,8 @@
     "registry": "https://npm.pkg.github.com/"
   },
   "homepage": "https://github.com/YourStream/Core#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/redis": "^4.0.10"
+  }
 }

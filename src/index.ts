@@ -1,5 +1,5 @@
-import { serviceManager, scopeManager } from "./services";
-import { logger } from "./utils";
+import { serviceManager, scopeManager } from "./services/index.js";
+import { logger } from "./utils/index.js";
 
 
 export {

@@ -1,4 +1,4 @@
-import serviceManager from "./ServiceManager";
+import serviceManager from "./ServiceManager.js";
 
 export class Scope{
     id: string;

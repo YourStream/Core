@@ -1,7 +1,7 @@
 import { Channel } from "amqplib";
-import { serviceManager, RabbitMQService } from ".";
-import logger from "../utils/logger";
-import { IBaseService } from "./IBaseService";
+import { serviceManager, RabbitMQService } from "./index.js";
+import logger from "../utils/logger.js";
+import { IBaseService } from "./IBaseService.js";
 
 export class SystemStatistic implements IBaseService {
     get name(): string {

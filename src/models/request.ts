@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { AuthUser } from './auth-user';
+import { AuthUser } from './auth-user.js';
 
 export interface YourStreamRequest extends Request{
     user?: AuthUser;

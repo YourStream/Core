@@ -1,5 +1,5 @@
-import { Scheduler } from "../types/schedulerService.types";
-import { BaseService } from "./BaseService";
+import { Scheduler } from "../types/schedulerService.types.js";
+import { BaseService } from "./BaseService.js";
 
 export class SchedulerService extends BaseService<string> {
     private _schedulers: Map<string, Scheduler> = new Map();

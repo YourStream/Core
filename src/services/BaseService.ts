@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
-import { ServiceEvent, ServiceEventCallback, ServiceEventRecordArray } from "../types/service.types";
-import { IBaseService } from "./IBaseService";
+import { ServiceEvent, ServiceEventCallback, ServiceEventRecordArray } from "../types/service.types.js";
+import { IBaseService } from "./IBaseService.js";
 
 
 export abstract class BaseService<EXPANSION_EVENTS extends string> implements EventEmitter, IBaseService {

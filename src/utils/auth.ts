@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
-import { verify } from './jwt';
-import { YourStreamRequest } from '../models/request';
+import { verify } from './jwt.js';
+import { YourStreamRequest } from '../models/request.js';
 
 function guard(req: YourStreamRequest, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;

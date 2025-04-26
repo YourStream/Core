@@ -1,11 +1,13 @@
-import serviceManager from './ServiceManager';
-import scopeManager from './ScopeManager';
-import { RabbitMQService, RabbitMQConfirmationService, RabbitMQUserDataService } from './RabbitMQService';
-import { IBaseService } from './IBaseService';
-import { BaseService } from './BaseService';
-import { SystemService } from './SystemService';
-import { SystemStatistic } from './systemStatistic';
-import { SchedulerService } from './SchedulerService';
+import serviceManager from './ServiceManager.js';
+import scopeManager from './ScopeManager.js';
+import { RabbitMQService, RabbitMQConfirmationService, RabbitMQUserDataService } from './RabbitMQService.js';
+import { IBaseService } from './IBaseService.js';
+import { BaseService } from './BaseService.js';
+import { SystemService } from './SystemService.js';
+import { SystemStatistic } from './systemStatistic.js';
+import { SchedulerService } from './SchedulerService.js';
+import redisPool from './RedisPool.js';
+import { RedisEventBus } from './RedisEventBus.js';
 
 export {
     serviceManager,
@@ -15,5 +17,7 @@ export {
     BaseService,
     SystemService,
     SystemStatistic,
-    SchedulerService
+    SchedulerService,
+    redisPool,
+    RedisEventBus,
 }

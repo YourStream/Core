@@ -1,4 +1,4 @@
-import pino from 'pino';
+import { pino } from 'pino';
 
 class Logger {
     private static _instance: Logger;

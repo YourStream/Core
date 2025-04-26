@@ -1,11 +1,11 @@
 import { connect, Connection } from 'amqplib';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 import fs from 'fs';
 import path from 'path';
-import { serviceManager } from '.';
-import { SystemService } from './SystemService';
-import { BaseResponse, CreateConfirmResponse } from '../models';
-import { UserPublicResponse, UserResponse } from '../models/userdataservice.response';
+import { serviceManager } from './index.js';
+import { SystemService } from './SystemService.js';
+import { BaseResponse, CreateConfirmResponse } from '../models/index.js';
+import { UserPublicResponse, UserResponse } from '../models/userdataservice.response.js';
 
 const SERVICE_NAME = process.env.SERVICE_NAME;
 

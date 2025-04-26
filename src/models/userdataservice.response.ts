@@ -1,4 +1,4 @@
-import { BaseResponse } from "./response";
+import { BaseResponse } from "./response.js";
 
 export type UserDataType = {
     _id: string,

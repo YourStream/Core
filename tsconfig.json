@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
     "declaration": true,
     "outDir": "dist",
     "esModuleInterop": true,
-    "composite": true
+    "composite": true,
   },
   "include": [
     "src/**/*"
