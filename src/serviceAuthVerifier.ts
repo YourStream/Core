@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { logger } from "./utils";
+import { NextFunction, Request, Response } from "express";
 
 class ServiceAuthVerifier {
     private name: string;
@@ -27,14 +28,33 @@ class ServiceAuthVerifier {
         this.name = name;
         this.secret = secret;
         this.authServiceAddress = authServiceAddress;
-        this._connected = await this.login() && await this.loadPublicKey();
-        if (!this._connected) {
-            logger.error("[ServiceAuthVerifier] Failed to connect to auth service");
+
+        try {
+            if (!name || !secret || !authServiceAddress) {
+                logger.error("[ServiceAuthVerifier] Missing required parameters for connection");
+                return false;
+            }
+
+            const loginSuccess = await this.login();
+            if (!loginSuccess) {
+                logger.error("[ServiceAuthVerifier] Login failed during connection");
+                return false;
+            }
+
+            const publicKeyLoaded = await this.loadPublicKey();
+            if (!publicKeyLoaded) {
+                logger.error("[ServiceAuthVerifier] Failed to load public key during connection");
+                return false;
+            }
+
+            this._connected = true;
+            logger.info("[ServiceAuthVerifier] Successfully connected to auth service");
+            this.runRefreshInterval();
+            return true;
+        } catch (error) {
+            logger.error("[ServiceAuthVerifier] Error during connection:", error);
             return false;
         }
-        logger.info("[ServiceAuthVerifier] Connected to auth service");
-        this.runRefreshInterval();
-        return true;
     }
 
     public async validateToken(token: string): Promise<boolean> {
@@ -122,31 +142,38 @@ class ServiceAuthVerifier {
     }
 
     private async refresh(): Promise<boolean> {
-        const response = await fetch(`${this.authServiceAddress}/api/internal/auth/refresh-token`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                refreshKey: this._refreshKey,
-            }),
-        });
-        if (response.status !== 200) {
-            logger.error("[ServiceAuthVerifier] Refresh failed");
-            logger.debug(`[ServiceAuthVerifier] Response: ${response.status} ${response.statusText}`);
-            logger.debug(`[ServiceAuthVerifier] Body: ${await response.text()}`);
+        try {
+            const response = await fetch(`${this.authServiceAddress}/api/internal/auth/refresh-token`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    refreshKey: this._refreshKey,
+                }),
+            });
+
+            if (response.status !== 200) {
+                logger.error("[ServiceAuthVerifier] Refresh failed");
+                logger.debug(`[ServiceAuthVerifier] Response: ${response.status} ${response.statusText}`);
+                return false;
+            }
+
+            const data = await response.json();
+            this._token = data.token;
+            this._refreshKey = data.refreshKey;
+
+            if (!this._token || !this._refreshKey) {
+                logger.error("[ServiceAuthVerifier] Invalid token or refreshKey during refresh");
+                return false;
+            }
+
+            logger.info("[ServiceAuthVerifier] Token successfully refreshed");
+            return true;
+        } catch (error) {
+            logger.error("[ServiceAuthVerifier] Error during token refresh:", error);
             return false;
         }
-        const data = await response.json();
-        this._token = data.token;
-        this._refreshKey = data.refreshKey;
-
-        if (!this._token || !this._refreshKey) {
-            logger.error("[ServiceAuthVerifier] Invalid token or refreshKey");
-            logger.debug(`[ServiceAuthVerifier] Body: ${await response.text()}`);
-            return false;
-        }
-
     }
 
     private async loadPublicKey(): Promise<boolean> {
@@ -171,4 +198,83 @@ class ServiceAuthVerifier {
 }
 
 const serviceAuthVerifier = new ServiceAuthVerifier();
-export { serviceAuthVerifier };
+
+function serviceAuthGuard(req: Request, res: Response, next: NextFunction) {
+    let token = req.headers["authorization"];
+
+    if (typeof token === "string") {
+        const parts = token.split(" ");
+        if (parts.length === 2) {
+            token = parts[1];
+        } else {
+            logger.debug("[ServiceAuthVerifier] Invalid token format");
+            res.status(401).send("Invalid token format");
+            return;
+        }
+    } else {
+        logger.debug("[ServiceAuthVerifier] Invalid token format");
+        res.status(401).send("Invalid token format");
+        return;
+    }
+    if (!token) {
+        logger.debug("[ServiceAuthVerifier] No token provided");
+        res.status(401).send("No token provided");
+        return;
+    }
+    if (!serviceAuthVerifier.connected) {
+        logger.error("[ServiceAuthVerifier] Not connected to auth service");
+        res.status(500).send("Not connected to auth service");
+        return;
+    }
+    serviceAuthVerifier.validateToken(token)
+        .then((valid) => {
+            if (!valid) {
+                logger.debug("[ServiceAuthVerifier] Invalid token");
+                res.status(401).send("Invalid token");
+            } else {
+                logger.debug("[ServiceAuthVerifier] Valid token");
+                next();
+            }
+        })
+        .catch((err) => {
+            logger.error("[ServiceAuthVerifier] Error validating token");
+            logger.debug(`[ServiceAuthVerifier] Error: ${err}`);
+            res.status(500).send("Error validating token");
+        });
+}
+
+async function buildServiceRequest(
+    serviceHost: string,
+    path: string,
+    options: {
+        method: "GET" | "POST" | "PUT" | "DELETE",
+        headers?: Record<string, string>
+        body?: object
+    } = { method: "GET" },
+): Promise<globalThis.Response> {
+    const url = `${serviceHost}${path}`;
+    const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceAuthVerifier.token}`,
+        ...options.headers,
+    };
+
+    const requestOptions: RequestInit = {
+        method: options.method,
+        headers,
+    };
+
+    if (options.body) {
+        requestOptions.body = JSON.stringify(options.body);
+    }
+
+    try {
+        const response = await fetch(url, requestOptions);
+        return response;
+    } catch (error) {
+        logger.error(`[buildServiceRequest] Error while making request to ${url}:`, error);
+        throw new Error("Failed to make service request");
+    }
+}
+
+export { serviceAuthVerifier, serviceAuthGuard, buildServiceRequest };

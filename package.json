@@ -1,6 +1,6 @@
 {
   "name": "@yourstream/core",
-  "version": "0.0.29",
+  "version": "0.0.32",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -51,20 +51,20 @@
   },
   "scripts": {
     "build": "tsc",
-    "publish": "npm run build && npm publish",
+    "build-publish": "npm run build && npm publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "VoDACode",
   "license": "ISC",
   "dependencies": {
-    "@types/amqplib": "^0.10.5",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.7",
-    "amqplib": "^0.10.4",
+    "@types/amqplib": "^0.10.7",
+    "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "amqplib": "^0.10.7",
     "generic-pool": "^3.9.0",
     "jsonwebtoken": "^9.0.2",
     "pino": "^9.6.0",
-    "redis": "^4.7.0"
+    "redis": "^5.0.0"
   },
   "bugs": {
     "url": "https://github.com/YourStream/Core/issues"
@@ -75,6 +75,6 @@
   "homepage": "https://github.com/YourStream/Core#readme",
   "description": "",
   "devDependencies": {
-    "@types/redis": "^4.0.10"
+    "@types/redis": "^4.0.11"
   }
 }

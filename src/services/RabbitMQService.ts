@@ -1,4 +1,4 @@
-import { connect, Connection } from 'amqplib';
+import { ChannelModel, connect } from 'amqplib';
 import logger from '../utils/logger.js';
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +10,7 @@ import { UserPublicResponse, UserResponse } from '../models/userdataservice.resp
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
 export class RabbitMQService {
-    private _connection: Connection | undefined = undefined;
+    private _connection: ChannelModel | undefined = undefined;
     private _reconnectTimeout: NodeJS.Timeout | undefined = undefined;
 
     constructor() {
@@ -122,8 +122,8 @@ export class RabbitMQService {
 
 abstract class BaseRabbitMQCommunicator {
     public abstract get name(): string;
-    private _connection?: Connection;
-    protected get connection(): Connection {
+    private _connection?: ChannelModel;
+    protected get connection(): ChannelModel {
         return this._connection;
     }
 
