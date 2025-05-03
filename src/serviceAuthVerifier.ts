@@ -112,6 +112,8 @@ class ServiceAuthVerifier {
             logger.debug(`[ServiceAuthVerifier] Body: ${await response.text()}`);
             return false;
         }
+        logger.info("[ServiceAuthVerifier] Login successful");
+        return true;
     }
 
     private runRefreshInterval() {
@@ -167,13 +169,12 @@ class ServiceAuthVerifier {
                 logger.error("[ServiceAuthVerifier] Invalid token or refreshKey during refresh");
                 return false;
             }
-
-            logger.info("[ServiceAuthVerifier] Token successfully refreshed");
-            return true;
         } catch (error) {
             logger.error("[ServiceAuthVerifier] Error during token refresh:", error);
             return false;
         }
+        logger.info("[ServiceAuthVerifier] Token successfully refreshed");
+        return true;
     }
 
     private async loadPublicKey(): Promise<boolean> {
