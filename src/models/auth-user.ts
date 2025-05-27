@@ -1,6 +1,5 @@
 export type AuthUser = {
-    id: string;
-    nickname: string;
+    userId: string;
     sessionId: string;
     createdAt: Date;
 };

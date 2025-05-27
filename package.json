@@ -1,11 +1,11 @@
 {
   "name": "@yourstream/core",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js", 
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./*": {
@@ -64,7 +64,7 @@
     "generic-pool": "^3.9.0",
     "jsonwebtoken": "^9.0.2",
     "pino": "^9.6.0",
-    "redis": "^5.0.0"
+    "redis": "^4.7.0"
   },
   "bugs": {
     "url": "https://github.com/YourStream/Core/issues"
@@ -75,6 +75,8 @@
   "homepage": "https://github.com/YourStream/Core#readme",
   "description": "",
   "devDependencies": {
-    "@types/redis": "^4.0.11"
+    "@types/node": "^22.15.23",
+    "@types/redis": "^4.0.11",
+    "typescript": "^5.8.3"
   }
 }

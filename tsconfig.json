@@ -5,6 +5,9 @@
     "outDir": "dist",
     "esModuleInterop": true,
     "composite": true,
+    "types": [
+      "node"
+    ],
   },
   "include": [
     "src/**/*"
