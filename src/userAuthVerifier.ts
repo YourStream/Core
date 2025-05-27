@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { YourStreamRequest } from "./models/request";
 import { logger } from "./utils";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { AuthUser } from "./models";
+import { AuthUser, BaseResponse } from "./models";
 
 class UserAuthVerifier {
     private static instance: UserAuthVerifier;
@@ -13,6 +13,10 @@ class UserAuthVerifier {
     private authServiceAddress: string | null = null;
 
     private constructor() { }
+
+    public get address(): string {
+        return this.authServiceAddress;
+    }
 
     public static getInstance(): UserAuthVerifier {
         if (!UserAuthVerifier.instance) {
@@ -40,32 +44,32 @@ class UserAuthVerifier {
     public async auth(req: YourStreamRequest, res: Response, next: NextFunction) {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
-            res.status(401).send('Unauthorized');
+            res.status(401).send(BaseResponse.error('Authorization header not found'));
             return;
         }
         const token = authHeader.split(' ')[1];
         if (!token) {
-            res.status(401).send('Unauthorized');
+            res.status(401).send(BaseResponse.error('Invalid token format'));
             return;
         }
 
         if (!this.publicKey) {
             logger.error("Public key is not available for verification");
-            res.status(500).send('Internal Server Error');
+            res.status(500).send(BaseResponse.error('Internal Server Error'));
             return;
         }
 
         try {
             const isValid = await this.validateToken(token);
             if (!isValid) {
-                res.status(401).send('Unauthorized');
+                res.status(401).send(BaseResponse.error('Unauthorized'));
                 return;
             }
             req.user = jwt.decode(token) as AuthUser;
             next();
         } catch (error) {
             logger.error("Error validating token:", error);
-            res.status(401).send('Unauthorized');
+            res.status(401).send(BaseResponse.error('Unauthorized. ' + (error instanceof Error ? error.message : '')));
         }
     }
 
@@ -138,9 +142,12 @@ class UserAuthVerifier {
     }
 }
 
-export const userAuthVerifier = UserAuthVerifier.getInstance();
-const auth = userAuthVerifier.auth.bind(userAuthVerifier);
+const userAuthVerifier = UserAuthVerifier.getInstance();
+// function guard(req: YourStreamRequest, res: Response, next: NextFunction): Promise<void>
+function guard(req: YourStreamRequest, res: Response, next: NextFunction) {
+    return userAuthVerifier.auth(req, res, next);
+}
 export {
-    auth,
-    UserAuthVerifier
+    guard,
+    userAuthVerifier
 }
