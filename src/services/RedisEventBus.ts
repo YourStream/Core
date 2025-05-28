@@ -23,6 +23,7 @@ export class RedisEventBus {
     private statusKey: string;
     private consumeCount: number;
     private blockTimeout: number;
+    private handlers: Array<BusEventHandler> = [];
     constructor(private options: BusOptions) {
         this.streamKey = options.streamKey;
         this.group = options.group;
@@ -40,14 +41,21 @@ export class RedisEventBus {
             throw new Error('blockTimeout must be a positive number');
         }
         this.init();
+        this.consume('default_consumer');
     }
 
     private async init() {
         try {
             const client = await redisPool.acquire();
+            const streamExists = await client.xInfoStream(this.streamKey).catch(() => null);
+            if (streamExists) {
+                logger.debug(`Redis EventBus "${this.streamKey}" already exists`);
+                return;
+            }
+
             client.xGroupCreate(this.streamKey, this.group, '$', { MKSTREAM: true });
             client.hSet(this.statusKey, 'status', 'ready');
-            logger.info(`Redis EventBus "${this.streamKey}" initialized with group "${this.group}"`);
+            logger.debug(`Redis EventBus "${this.streamKey}" initialized with group "${this.group}"`);
         } catch (error) {
             logger.error(`Error initializing Redis EventBus: ${error}`);
             throw error;
@@ -68,7 +76,40 @@ export class RedisEventBus {
         return jobId;
     }
 
-    async consume(consumer: string, handler: BusEventHandler) {
+    on(eventType: string, handler: BusEventHandler) {
+        if (typeof handler !== 'function') {
+            throw new Error('Handler must be a function');
+        }
+        this.handlers.push(handler);
+        logger.debug(`Handler registered for event type "${eventType}"`);
+    }
+
+    async off(eventType: string, handler: BusEventHandler) {
+        this.handlers = this.handlers.filter(h => h !== handler);
+        logger.debug(`Handler unregistered for event type "${eventType}"`);
+    }
+
+    private emit(event: BusEvent, id: string, jobId: string) {
+        for (const handler of this.handlers) {
+            handler(event, id, jobId).catch(error => {
+                logger.error(`Error in handler for event type "${event.type}": ${error}`);
+            });
+        }
+    }
+
+    private async consume(consumer: string) {
+        while (true) {
+            try {
+                await this.processMessages(consumer, this.emit.bind(this));
+                await new Promise(resolve => setTimeout(resolve, 50)); // Optional delay between iterations
+            } catch (error) {
+                logger.error(`Error in consume loop: ${error}`);
+                // Optionally, you can add a delay before retrying
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+    }
+    private async processMessages(consumer: string, handler: BusEventHandler) {
         let client = await redisPool.acquire();
         const response = await client.xReadGroup(
             this.group,
